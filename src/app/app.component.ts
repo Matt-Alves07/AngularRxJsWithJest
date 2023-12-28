@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
-import { Observable, Subject, takeUntil, zip } from 'rxjs';
+import { Observable, Subject, from, map, of, takeUntil, zip } from 'rxjs';
 // #endregion
 
 // #region Project's imports
@@ -19,6 +19,12 @@ import { SchoolService } from './services/school.service';
 })
 export class AppComponent implements OnInit {
   // #region private properties
+  private ages = of(20, 30, 40, 50, 60, 70);
+  private peopleData = from([
+    { name: 'John Doe', age: 18, profession: 'Software Engineer' },
+    { name: 'Julie Doe', age: 18, profession: 'UX' },
+    { name: 'George Doe', age: 18, profession: 'Scrum Master' },
+  ]);
   private readonly destroy$: Subject<void> = new Subject();
   private zipSchoolResponses$ = zip(
     this.getStudentsData(),
@@ -36,6 +42,8 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.getSchoolData();
+    this.getMultipliedAges();
+    this.getPeopleProfessions();
   }
 
   public getSchoolData(): void {
@@ -51,6 +59,30 @@ export class AppComponent implements OnInit {
         error: (err) => {
           console.error(err);
         }
+      });
+  }
+
+  public getMultipliedAges(): void {
+    this.ages
+      .pipe(
+        map((element) => {
+          return element * 2;
+        })
+      )
+      .subscribe({
+        next: (value) => {
+          console.log(`Age multiplied by 2 is ${value}`);
+        }
+      });
+  }
+
+  public getPeopleProfessions(): void {
+    this.peopleData
+      .pipe(
+        map((element) => element.profession)
+      )
+      .subscribe({
+        next: (response) => console.log(`Profession: ${response}`)
       });
   }
 
