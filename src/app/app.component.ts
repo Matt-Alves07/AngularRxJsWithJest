@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
-import { Observable, Subject, from, map, of, takeUntil, zip } from 'rxjs';
+import { Observable, Subject, filter, from, map, of, switchMap, takeUntil, zip } from 'rxjs';
 // #endregion
 
 // #region Project's imports
@@ -19,11 +19,14 @@ import { SchoolService } from './services/school.service';
 })
 export class AppComponent implements OnInit {
   // #region private properties
+  private studentUserId = '2';
   private ages = of(20, 30, 40, 50, 60, 70);
   private peopleData = from([
     { name: 'John Doe', age: 18, profession: 'Software Engineer' },
     { name: 'Julie Doe', age: 18, profession: 'UX' },
     { name: 'George Doe', age: 18, profession: 'Scrum Master' },
+    { name: 'Sebastian Doe', age: 50, profession: 'Software Engineer' },
+    { name: 'Rachel Doe', age: 30, profession: 'Software Engineer' },
   ]);
   private readonly destroy$: Subject<void> = new Subject();
   private zipSchoolResponses$ = zip(
@@ -44,6 +47,9 @@ export class AppComponent implements OnInit {
     this.getSchoolData();
     this.getMultipliedAges();
     this.getPeopleProfessions();
+    this.getPeopleNameByProfession('Software Engineer');
+    this.getPeopleNameByProfession('Scrum Master');
+    this.getStudentByID(this.studentUserId);
   }
 
   public getSchoolData(): void {
@@ -65,9 +71,8 @@ export class AppComponent implements OnInit {
   public getMultipliedAges(): void {
     this.ages
       .pipe(
-        map((element) => {
-          return element * 2;
-        })
+        map((element) => { return element * 2; }),
+        takeUntil(this.destroy$),
       )
       .subscribe({
         next: (value) => {
@@ -79,10 +84,36 @@ export class AppComponent implements OnInit {
   public getPeopleProfessions(): void {
     this.peopleData
       .pipe(
-        map((element) => element.profession)
+        map((element) => element.profession),
+        takeUntil(this.destroy$),
       )
       .subscribe({
         next: (response) => console.log(`Profession: ${response}`)
+      });
+  }
+
+  public getPeopleNameByProfession(profession: string): void {
+    this.peopleData
+      .pipe(
+        filter((person) => person.profession === profession),
+        //Another way to print the professional name, but it removes every
+        //other property existing in PeopleData
+        //map((element) => element.name),
+        takeUntil(this.destroy$)
+      )
+      .subscribe({
+        next: (response) => console.log(`Person found working as a ${profession} : ${response.name}`)
+      });
+  }
+
+  public getStudentByID(id: string): void {
+    this.getStudentsData()
+      .pipe(
+        switchMap((students) => this.findStudentByID(students, this.studentUserId)),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        next: ((response) => {console.log(response)}),
       });
   }
 
@@ -93,6 +124,10 @@ export class AppComponent implements OnInit {
 
   private getTeachersData(): Observable<Array<SchoolData>> {
     return this.schoolService.getTeachers();
+  }
+
+  private findStudentByID(students: Array<SchoolData>, studentId: string) {
+    return from([students.find((student) => student.id === studentId)]);
   }
   // #endregion
 }
