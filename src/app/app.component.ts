@@ -1,7 +1,7 @@
 // #region Angular's imports
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Observable, Subject, filter, from, map, of, switchMap, takeUntil, zip } from 'rxjs';
 // #endregion
 
@@ -39,6 +39,9 @@ export class AppComponent implements OnInit {
   public title = 'rxjs-jest';
   public students: Array<SchoolData> = [];
   public teachers: Array<SchoolData> = [];
+
+  @Input() public projectName!: string;
+  @Output() public outputEvent = new EventEmitter<string>;
   // #endregion
 
   constructor(private schoolService: SchoolService) {}
@@ -50,6 +53,10 @@ export class AppComponent implements OnInit {
     this.getPeopleNameByProfession('Software Engineer');
     this.getPeopleNameByProfession('Scrum Master');
     this.getStudentByID(this.studentUserId);
+  }
+
+  public handleEmitEvent(): void {
+    this.outputEvent.emit("The value was emitted by an @Output() decorator");
   }
 
   public getSchoolData(): void {
