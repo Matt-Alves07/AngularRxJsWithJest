@@ -39,6 +39,7 @@ export class AppComponent implements OnInit {
   public title = 'rxjs-jest';
   public students: Array<SchoolData> = [];
   public teachers: Array<SchoolData> = [];
+  public renderTextMessage: boolean = false;
 
   @Input() public projectName!: string;
   @Output() public outputEvent = new EventEmitter<string>;

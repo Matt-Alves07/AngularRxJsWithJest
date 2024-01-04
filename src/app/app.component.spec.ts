@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { first } from 'rxjs';
+import { DebugElement } from '@angular/core';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -39,8 +40,6 @@ describe('AppComponent', () => {
   });
 
   it(`should emit event with @Output() decorator correctly`, () => {
-    component.projectName = "Testing the @Output() decorator";
-
     component.outputEvent
       .pipe(
         first(),
@@ -48,7 +47,26 @@ describe('AppComponent', () => {
       .subscribe({
         next: (value) => {
           expect(value).toEqual("The value was emitted by an @Output() decorator");
-        }
+        },
       });
+  });
+
+  it(`should render text message in the DOM`, () => {
+    component.renderTextMessage = true;
+    fixture.detectChanges();
+
+    const componentDebugElement: DebugElement = fixture.debugElement;
+    const element: HTMLElement = componentDebugElement.nativeElement;
+    const paragraph = element.querySelector('p');
+
+    expect(paragraph?.textContent).toEqual('Testing my angular application');
+  });
+
+  it(`shouldn't render text message in the DOM`, () => {
+    const componentDebugElement: DebugElement = fixture.debugElement;
+    const element: HTMLElement = componentDebugElement.nativeElement;
+    const paragraph = element.querySelector('p');
+
+    expect(paragraph).toBeNull();
   });
 });
