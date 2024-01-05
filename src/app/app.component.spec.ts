@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { first } from 'rxjs';
 import { DebugElement } from '@angular/core';
@@ -69,4 +69,17 @@ describe('AppComponent', () => {
 
     expect(paragraph).toBeNull();
   });
+
+  it(`should have isDone property as false`, () => {
+    component.handleCheckIsDone();
+    expect(component.isDone).toBeFalsy();
+  });
+
+  it (`should have isDone property as true`, fakeAsync(() => {
+    component.handleCheckIsDone();
+
+    tick(1000); // wait for 1 second to make sure that task is
+
+    expect(component.isDone).toBeTruthy();
+  }));
 });

@@ -37,6 +37,7 @@ export class AppComponent implements OnInit {
 
   // #region public properties
   public title = 'rxjs-jest';
+  public isDone: boolean = false;
   public students: Array<SchoolData> = [];
   public teachers: Array<SchoolData> = [];
   public renderTextMessage: boolean = false;
@@ -48,16 +49,22 @@ export class AppComponent implements OnInit {
   constructor(private schoolService: SchoolService) {}
 
   ngOnInit(): void {
-    this.getSchoolData();
+    /*this.getSchoolData();
     this.getMultipliedAges();
     this.getPeopleProfessions();
     this.getPeopleNameByProfession('Software Engineer');
     this.getPeopleNameByProfession('Scrum Master');
-    this.getStudentByID(this.studentUserId);
+    this.getStudentByID(this.studentUserId);*/
   }
 
   public handleEmitEvent(): void {
     this.outputEvent.emit("The value was emitted by an @Output() decorator");
+  }
+
+  public handleCheckIsDone(): void {
+    setTimeout(() => {
+      this.isDone = true;
+    }, 200);
   }
 
   public getSchoolData(): void {
